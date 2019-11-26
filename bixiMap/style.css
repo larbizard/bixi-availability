@@ -1,0 +1,64 @@
+
+/* Always set the map height explicitly to define the size of the div * element that contains the map. */
+ #mapName {
+     height: 100%;
+}
+/* Optional: Makes the sample page fill the window. */
+ html, body {
+     height: 100%;
+     margin: 0;
+     padding: 0;
+}
+ #main {
+     position: fixed;
+     overflow-y: hidden;
+     transition-property: all;
+     transition-duration: .5s;
+     transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+     position: fixed;
+     top: 10%;
+     right:3%;
+     left: 3%;
+     padding: 1%;
+     border-radius: 10px;
+}
+ #main.closed {
+     max-height: 11%;
+}
+/*Desktop*/
+ @media only screen and (min-width: 600px) {
+     #main {
+         width: 20%;
+    }
+}
+ #search-bar {
+     border-radius: 10px;
+     background-color: white;
+}
+ #search-bar input {
+     width: 100%;
+}
+ #availability {
+     overflow-y: hidden;
+     display: block;
+     transition-property: all;
+     transition-duration: .5s;
+     transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+}
+ #availability.opened {
+     display : none;
+}
+ #footer-mobile {
+     overflow-y: hidden;
+     display : none;
+     transition-property: all;
+     transition-duration: .5s;
+     transition-timing-function: cubic-bezier(0, 1, 0.5, 1);
+}
+ #footer-mobile.opened {
+     display: block;
+}
+ #footer-mobile p, a {
+     font-size: 3.5vw;
+}
+

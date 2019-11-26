@@ -1,142 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-      <!-- Global site tag (gtag.js) - Google Analytics -->
+
+<head>
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=1.0">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-152431436-1"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
 
-      gtag('config', 'UA-152431436-1');
+          gtag('config', 'UA-152431436-1');
     </script>
 
     <meta charset="utf-8">
     <title>MTL Biking Availability per Hour per Week Day</title>
-    <link rel="shortcut icon" type="image/png" href="favicon.ico"/>
+    <link rel="shortcut icon" type="image/png" href="favicon.ico" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
-    <style>
-      /* Always set the map height explicitly to define the size of the div
-       * element that contains the map. */
-      #mapName {
-        height: 100%;
-      }
-      /* Optional: Makes the sample page fill the window. */
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-       #wrapper { position: relative; }
-       #over_map { position: absolute; top: 10px; left: 10px; z-index: 99; }
+    <link rel="stylesheet" href="/style.css">
 
-       #search-bar {
-         position: fixed;
-         width: 500px;
-         /*height: 200px;*/
-         top:2%; right:3%;
-       }
-       #search-bar input {
-        width: 80%;
-       }
-       .header {
-        width: 100%;
-        height: 100%;
-        background-color: white;
-        padding: 2%;
-       }
-       .footer {
-        width: 100%;
-        height: 270px;
-        background-color: white;
-        padding: 2%;
-       }
+</head>
 
-    </style>
-
-  </head>
-  <body>
+<body>
     <div class="google-map" id="mapName">
     </div>
-  <div id="search-bar">
-            <div class="header">
-                <strong>Welcome on Bixi Average Bikes Availability</strong>
-                <p><strong>Select</strong> a <strong>Day</strong> of the Week and an <strong>Hour</strong> and submit the form.</p>
-                <p><strong>Click on the marker</strong> to get the average availability of bikes in your preferred station.</p>
-                <br/>
-                <strong>Most available to less available</strong><br/>
-                <img src="images/green-bike.png" alt="Green bike"/>
-                <img src="images/yellow-bike.png" alt="Yellow bike"/>
-                <img src="images/orange-bike.png" alt="Orange bike"/>
-                <img src="images/black-bike.png" alt="Black bike"/>
-                <canvas id='myChart' width='400' height='300'></canvas>
+    <div id="app">
+        <div id="main" class="columns">
+            <div id="search-bar" class="column">
+                <div class="buttons is-centered"><button id="hide-button" class="button is-dark is-fullwidth" onclick="hideResults()">Close</button></div>
+                <div id="availability">
+                    <img src="images/green-bike.png" alt="Green bike" />
+                    <img src="images/yellow-bike.png" alt="Yellow bike" />
+                    <img src="images/orange-bike.png" alt="Orange bike" />
+                    <img src="images/black-bike.png" alt="Black bike" />
+                    <canvas id='myChart' style="height: 4%;"></canvas>
 
-              <form @submit.prevent="fetchData">
-              <div class="control">
-                <div class="select is-fullwidth">
-                    <select v-model="selectedDay">
+                        <form @submit.prevent="fetchData">
+
+                        <div class="field control">
+                            <div class="field select is-fullwidth">
+                                <select v-model="selectedDay">
                       <option v-for="day in days" v-bind:value="day.value">
                           {{ day.text }}
                       </option>
                     </select>
-                </div>
+                            </div>
 
-                <div class="select is-fullwidth">
-                  <select v-model.number="hour">
-                      <option value="0">00:00</option>
-                      <option value="1">01:00</option>
-                      <option value="2">02:00</option>
-                      <option value="3">03:00</option>
-                      <option value="4">04:00</option>
-                      <option value="5">05:00</option>
-                      <option value="6">06:00</option>
-                      <option value="7">07:00</option>
-                      <option value="8">08:00</option>
-                      <option value="9">09:00</option>
-                      <option value="10">10:00</option>
-                      <option value="11">11:00</option>
-                      <option value="12">12:00</option>
-                      <option value="13">13:00</option>
-                      <option value="14">14:00</option>
-                      <option value="15">15:00</option>
-                      <option value="16">16:00</option>
-                      <option value="17">17:00</option>
-                      <option value="18">18:00</option>
-                      <option value="19">19:00</option>
-                      <option value="20">20:00</option>
-                      <option value="21">21:00</option>
-                      <option value="22">22:00</option>
-                      <option value="23">23:00</option>
-                      <option value="24">24:00</option>
-                  </select>
-                </div>
-                <!--<input class="input" type="text" v-model.number="short_name" placeholder="Enter station name">
+                            <div class="field select is-fullwidth">
+                                <select v-model.number="hour">
+                              <option value="0">00:00</option>
+                              <option value="1">01:00</option>
+                              <option value="2">02:00</option>
+                              <option value="3">03:00</option>
+                              <option value="4">04:00</option>
+                              <option value="5">05:00</option>
+                              <option value="6">06:00</option>
+                              <option value="7">07:00</option>
+                              <option value="8">08:00</option>
+                              <option value="9">09:00</option>
+                              <option value="10">10:00</option>
+                              <option value="11">11:00</option>
+                              <option value="12">12:00</option>
+                              <option value="13">13:00</option>
+                              <option value="14">14:00</option>
+                              <option value="15">15:00</option>
+                              <option value="16">16:00</option>
+                              <option value="17">17:00</option>
+                              <option value="18">18:00</option>
+                              <option value="19">19:00</option>
+                              <option value="20">20:00</option>
+                              <option value="21">21:00</option>
+                              <option value="22">22:00</option>
+                              <option value="23">23:00</option>
+                              <option value="24">24:00</option>
+                          </select>
+                            </div>
+                            <!--<input class="input" type="text" v-model.number="short_name" placeholder="Enter station name">
                 Add auto completion-->
-                <div class="buttons control is-fullwidth has-addons is-centered">
-                      <input class="button is-primary is-fullwidth" type="submit" value="Get availability">
+                            <div class="field buttons control is-fullwidth has-addons is-centered">
+                                <input class="input button is-primary is-fullwidth" type="submit" value="Get availability">
+                            </div>
+                        </div>
+                    </form>
                 </div>
-              </div>
-          </form>
-              <div class="footer">
-                  <strong>Information</strong>
-                  <p>The data was parsed during 2 months this summer (2019) using Bixi API every 5 seconds. This project is for educational purpose. It is not for commercial purpose.</p>
-                  <p><strong>Bixi API</strong></p>
-                  <a href="https://api-core.bixi.com/gbfs/en/station_information.json">https://api-core.bixi.com/gbfs/en/station_information.json</a>
-                  <a href="https://api-core.bixi.com/gbfs/en/station_status.json">https://api-core.bixi.com/gbfs/en/station_status.json</a>
-                  <p><strong>Github</strong></p>
-                  <a href="https://github.com/larbizard/bixi-availability">https://github.com/larbizard/bixi-availability</a>
-                  <p><strong>Build by</strong></p>
-                  <p><img src="images/logo.png" width="24"/><a href="http://www.larbizard.com">Larbizard</a> using <a href="https://www.djangoproject.com/">Django (Python)</a> and <a href="https://vuejs.org/">VueJS.</a></p>
-              </div>
-            </div>
+                <br>
+                <div class="buttons is-centered"><button id="hide-footer" class="button is-fullwidth" onclick="window.location.href ='information.html'">Information</button></div>
 
-  </div>
-  </body>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyABdR9rZXh6BcxjewLPFQuVf-aIEsjfEZs&callback=initMap"></script>
-  <script src="app.js"></script>
-  <script id="mcjs">!function(c,h,i,m,p){m=c.createElement(h),p=c.getElementsByTagName(h)[0],m.async=1,m.src=i,p.parentNode.insertBefore(m,p)}(document,"script","https://chimpstatic.com/mcjs-connected/js/users/738401601c3732b902a2a4536/0da9dfee1a0ed823a8717e63a.js");</script>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyABdR9rZXh6BcxjewLPFQuVf-aIEsjfEZs&callback=initMap"></script>
+<script src="app.js"></script>
+<script id="mcjs">
+    !function(c,h,i,m,p){m=c.createElement(h),p=c.getElementsByTagName(h)[0],m.async=1,m.src=i,p.parentNode.insertBefore(m,p)}(document,"script","https://chimpstatic.com/mcjs-connected/js/users/738401601c3732b902a2a4536/0da9dfee1a0ed823a8717e63a.js");
+</script>
+<script>
+    function hideResults() {
+        document.getElementById('main').classList.toggle('closed');
+    }
+    $("#hide-button").on('click',function(){
+        var self=$(this);
+        if(self.text()=="Close")
+        {
+         self.text("Filter");
+         self.attr('class', 'button is-primary is-fullwidth');
+        }
+        else {
+         self.text("Close");
+         self.attr('class', 'button is-dark is-fullwidth');
+        }
+    });
+</script>
+
 </html>

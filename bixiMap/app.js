@@ -1,7 +1,7 @@
 //TODO: Import Google Maps NPM instead of using script in index.html
 
 var vm = new Vue({
-  el: '#search-bar',
+  el: '#app',
   data: {
       markerCoordinates: [],
       selectedDay: 'Sunday',
@@ -22,10 +22,47 @@ var vm = new Vue({
   },
   mounted: function () {
   try{
-    this.map = new google.maps.Map(document.getElementById('mapName'), {
+        this.map = new google.maps.Map(document.getElementById('mapName'), {
           center: {lat: 45.509462, lng: -73.613413},
-          zoom: 13
+          zoom: 12
         });
+
+       var minZoomLevel = 12;
+
+       map = this.map;
+       // Bounds for North America
+       var strictBounds = new google.maps.LatLngBounds(
+            new google.maps.LatLng(45.381090, -74.008713),
+            new google.maps.LatLng(45.737339, -73.404465)
+       );
+
+       // Listen for the dragend event
+       google.maps.event.addListener(map, 'dragend', function() {
+         if (strictBounds.contains(map.getCenter())) return;
+
+         // We're out of bounds - Move the map back within the bounds
+
+         var c = map.getCenter(),
+             x = c.lng(),
+             y = c.lat(),
+             maxX = strictBounds.getNorthEast().lng(),
+             maxY = strictBounds.getNorthEast().lat(),
+             minX = strictBounds.getSouthWest().lng(),
+             minY = strictBounds.getSouthWest().lat();
+
+         if (x < minX) x = minX;
+         if (x > maxX) x = maxX;
+         if (y < minY) y = minY;
+         if (y > maxY) y = maxY;
+
+         map.setCenter(new google.maps.LatLng(y, x));
+       });
+
+       // Limit the zoom level
+       google.maps.event.addListener(map, 'zoom_changed', function() {
+         if (map.getZoom() < minZoomLevel) map.setZoom(minZoomLevel);
+       });
+
         this.getStationMarkers();
         this.fetchData();
         var colors = this.generateColors(Array.apply(null, Array(24)).map(Number.prototype.valueOf,0));
@@ -94,10 +131,10 @@ var vm = new Vue({
                 self.markers.forEach(function(marker){
                     availability = json[marker.station_data.short_name.toString()][self.selectedDay][self.hour]['availability'];
                     if(!availability){
-                        marker.infowindow.setContent("<p style='font-size: 1.5vw'><img src='images/red-bike-no-back.png'/><br/>No data !</p>");
+                        marker.infowindow.setContent("<p class='content'><img src='images/red-bike-no-back.png'/><br/>No data !</p>");
                     }else {
                         capacity = json[marker.station_data.short_name.toString()][self.selectedDay][self.hour]['capacity'];
-                        marker.infowindow.setContent("<p style='font-size: 1.5vw'><img src='" + self.getBikeIcon(availability) + "'/><br/>At station <strong>"+ marker.title    +
+                        marker.infowindow.setContent("<p class='content'><img src='" + self.getBikeIcon(availability) + "'/><br/>At station <strong>"+ marker.title    +
                         "</strong><br/>on "+ self.getDayText(self.selectedDay) + "'s<br/>between <strong>" + self.hour.toString()  + ":00</strong> and <strong>" +
                         (Number(self.hour)+1).toString() + ":00</strong><br/><strong>"+availability.toString()+"%</strong> of bikes are available.<br/>An<strong> average of " + Math.floor(availability*capacity/100) + " out of " + capacity + " bikes.</strong></p>");
                         marker.setIcon(self.getBikeIcon(availability));
