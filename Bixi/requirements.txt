@@ -59,7 +59,7 @@ pycparser==2.19
 Pygments==2.4.2
 pyOpenSSL==19.0.0
 pyparsing==2.4.2
-PyPDF2==1.26.0
+PyPDF2==1.27.5
 pyrsistent==0.15.5
 PySocks==1.6.8
 pytest==5.2.2
