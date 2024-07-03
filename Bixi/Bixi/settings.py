@@ -11,24 +11,25 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+import dotenv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+dotenv_file = os.path.join(BASE_DIR, ".env")
+if os.path.isfile(dotenv_file):
+    dotenv.load_dotenv(dotenv_file)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '5$(um$c288)9c9f(gog5w39!w#m%13g9+tfr8e2j-o+ljwh1pd'
+SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True if os.environ['DEBUG'] == 'True' else False
 
-ALLOWED_HOSTS = ['bixi-eb-larbizard-2.sjkv76itfu.us-west-2.elasticbeanstalk.com',
-                 'www.bixi-availability.com',
-                 'localhost',
-                 '35.160.222.171']
+ALLOWED_HOSTS = ["*"]
 
 #https://github.com/crs4/ome_seadragon/wiki/Enable-Django-CORS-(Cross-Origin-Resource-Sharing)-Headers-configuration
 CORS_ORIGIN_ALLOW_ALL = True
@@ -84,20 +85,12 @@ WSGI_APPLICATION = 'Bixi.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'bixi_occupancy',
-        'USER': 'bixi',
-        'PASSWORD': 'bixi',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.environ['DATABASE_NAME'],
+        'USER': os.environ['DATABASE_USERNAME'],
+        'PASSWORD': os.environ['DATABASE_USER_PASSWORD'],
+        'HOST': os.environ['DATABASE_HOST'],
+        'PORT': os.environ['DATABASE_PORT'],
     },
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    #     'NAME': 'jafbodit',
-    #     'USER': 'jafbodit',
-    #     'PASSWORD': 'r--IV_E6vH5oL6FZQPIDq-CjdDWv8vYB',
-    #     'HOST': 'raja.db.elephantsql.com',
-    #     'PORT': '5432',
-    # }
 }
 
 
